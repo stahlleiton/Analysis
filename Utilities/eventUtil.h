@@ -5,8 +5,6 @@
 #ifndef EVENTUTILS_H_
 #define EVENTUTILS_H_
 
-#include "TLorentzVector.h"
-
 namespace HI {
   enum TRIGGERBIT {
     HLT_HIL1DoubleMu0_v1 = 0,
@@ -69,89 +67,105 @@ namespace HI {
   };
 };
 
-Bool_t isTriggerMatch (Int_t iRecoMu, Int_t TriggerBit) 
-{
-  Bool_t cond = true;
-  cond = cond && ( (HLTriggers&((ULong64_t)pow(2, TriggerBit))) == ((ULong64_t)pow(2, TriggerBit)) ); 
-  cond = cond && ( (Reco_mu_trig[iRecoMu]&((ULong64_t)pow(2, TriggerBit))) == ((ULong64_t)pow(2, TriggerBit)) );
-  return cond;
+namespace PP {
+  enum TRIGGERBIT {
+    HLT_HIL1DoubleMu0_v1 = 0,
+    HLT_HIL1DoubleMu10_v1 = 1,
+    HLT_HIL2DoubleMu0_NHitQ_v1 = 2,
+    HLT_HIL3DoubleMu0_OS_m2p5to4p5_v1 = 3,
+    HLT_HIL3DoubleMu0_OS_m7to14_v1 = 4,
+    HLT_HIL2Mu3_NHitQ10_v1 = 5,
+    HLT_HIL3Mu3_NHitQ15_v1 = 6,
+    HLT_HIL2Mu5_NHitQ10_v1 = 7,
+    HLT_HIL3Mu5_NHitQ15_v1 = 8,
+    HLT_HIL2Mu7_NHitQ10_v1 = 9,
+    HLT_HIL3Mu7_NHitQ15_v1 = 10,
+    HLT_HIL2Mu15_v1 = 11,
+    HLT_HIL3Mu15_v1 = 12,
+    HLT_HIL2Mu20_v1 = 13,
+    HLT_HIL3Mu20_v1 = 14
+  };
 };
 
-Bool_t isGlobalMuonInAccept (TLorentzVector* Muon) 
-{
-  return (fabs(Muon->Eta()) < 2.4 &&
-          ((fabs(Muon->Eta()) < 1.0 && Muon->Pt() >= 3.4) ||
-           (1.0 <= fabs(Muon->Eta()) && fabs(Muon->Eta()) < 1.5 && Muon->Pt() >= 5.8-2.4*fabs(Muon->Eta())) ||
-           (1.5 <= fabs(Muon->Eta()) && Muon->Pt() >= 3.3667-7.0/9.0*fabs(Muon->Eta()))));
-};
-
-Bool_t isSoftMuon (Int_t iRecoMu) 
-{
-  Bool_t cond = true;
-  // cond = cond && (Reco_mu_highPurity[iRecoMu]);
-  cond = cond && (Reco_mu_isGoodMuon[iRecoMu]);
-  cond = cond && (Reco_mu_nTrkWMea[iRecoMu] > 5);
-  cond = cond && (Reco_mu_nPixWMea[iRecoMu] > 0);
-  cond = cond && (fabs(Reco_mu_dxy[iRecoMu]) < 0.3);
-  cond = cond && (fabs(Reco_mu_dz[iRecoMu]) < 20.);
-  return cond;
-};
-
-
-namespace GEN {
+namespace RecoQQ {
+  Bool_t iniBranches(fChain* fChain)
+  {
+    fChain->SetBranchStatus("HLTriggers",1); 
+    fChain->SetBranchStatus("Reco_QQ_trig",1);
+    fChain->SetBranchStatus("Reco_QQ_VtxProb",1); 
+    fChain->SetBranchStatus("Reco_QQ_mupl_isGoodMuon",1); 
+    fChain->SetBranchStatus("Reco_QQ_mumi_isGoodMuon",1);
+    fChain->SetBranchStatus("Reco_QQ_mupl_nTrkWMea",1); 
+    fChain->SetBranchStatus("Reco_QQ_mumi_nTrkWMea",1);
+    fChain->SetBranchStatus("Reco_QQ_mupl_nPixWMea",1); 
+    fChain->SetBranchStatus("Reco_QQ_mumi_nPixWMea",1);
+    fChain->SetBranchStatus("Reco_QQ_mupl_dxy",1); 
+    fChain->SetBranchStatus("Reco_QQ_mumi_dxy",1);
+    fChain->SetBranchStatus("Reco_QQ_mupl_dz",1); 
+    fChain->SetBranchStatus("Reco_QQ_mumi_dz",1);
+  }
+    
+  Bool_t isTriggerMatch (Int_t iRecoQQ, Int_t TriggerBit) 
+  {
+    Bool_t cond = true;
+    cond = cond && ( (HLTriggers&((ULong64_t)pow(2, TriggerBit))) == ((ULong64_t)pow(2, TriggerBit)) ); 
+    cond = cond && ( (Reco_QQ_trig[iRecoQQ]&((ULong64_t)pow(2, TriggerBit))) == ((ULong64_t)pow(2, TriggerBit)) );
+    return cond;
+  };
   
-  Double_t deltaR (TLorentzVector* GenMuon, TLorentzVector* RecoMuon) 
+  Bool_t isGlobalMuonInAccept2011 (TLorentzVector* Muon) 
   {
-    Double_t dEta = RecoMuon->Eta() - GenMuon->Eta();
-    Double_t dPhi = RecoMuon->Phi() - GenMuon->Phi();
-    return ((Double_t) TMath::Sqrt( (dEta*dEta) + (dPhi*dPhi) ) );
+    return (fabs(Muon->Eta()) < 2.4 &&
+	    ((fabs(Muon->Eta()) < 1.0 && Muon->Pt() >= 3.4) ||
+	     (1.0 <= fabs(Muon->Eta()) && fabs(Muon->Eta()) < 1.5 && Muon->Pt() >= 5.8-2.4*fabs(Muon->Eta())) ||
+	     (1.5 <= fabs(Muon->Eta()) && Muon->Pt() >= 3.3667-7.0/9.0*fabs(Muon->Eta()))));
   };
 
-  Int_t getMatchedRecoMuon (Int_t iGenMuon, Double_t maxDeltaR = 0.5, Double_t maxDPtRel = 0.5, Bool_t checkCharge = true) 
+  Bool_t areMuonsInAcceptance2011 (Int_t iRecoQQ)
   {
-    TLorentzVector *GenMuon = (TLorentzVector*)Gen_mu_4mom->At(iGenMuon);
-    Double_t dRMin = 1000000000000000000.0; Int_t iMatchedRecoMuon = -99;
-    for (Int_t iRecoMuon=0; iRecoMuon<Reco_mu_size; iRecoMuon++) {
-      TLorentzVector *RecoMuon = (TLorentzVector*)Reco_mu_4mom->At(iRecoMuon);
-      Double_t dR = deltaR( GenMuon, RecoMuon);
-      if ((iRecoMuon>0 && dR<dRMin) || iRecoMuon==0){
-      dRMin = dR;
-      iMatchedRecoMuon = iRecoMuon;
-      }
-    }
-    if (dRMin < maxDeltaR) {
-      if ( (checkCharge && Gen_mu_charge[iGenMuon]==Reco_mu_charge[iMatchedRecoMuon]) || !checkCharge ){
-        TLorentzVector* MatchedRecoMuon = (TLorentzVector*)Reco_mu_4mom->At(iMatchedRecoMuon);   
-        if ( ((fabs(MatchedRecoMuon->Pt()-GenMuon->Pt())/GenMuon->Pt())<maxDPtRel) ){ 
-          return iMatchedRecoMuon; 
-        }
-      }
-    }    
-    return -99; 
+    TLorentzVector *RecoQQmupl = (TLorentzVector*) Reco_QQ_mupl_4mom->At(iRecoQQ);
+    TLorentzVector *RecoQQmumi = (TLorentzVector*) Reco_QQ_mumi_4mom->At(iRecoQQ);
+    return ( isGlobalMuonInAccept2011(RecoQQmupl) && isGlobalMuonInAccept2011(RecoQQmumi) );
   };
-
-  Bool_t isTagMuon (Int_t iMatchedRecoMuon)
+  
+  Bool_t isGlobalMuonInAccept2015 (TLorentzVector* Muon) 
   {
-    if (iMatchedRecoMuon < 0) { return false; }
-    if (isTriggerMatch(iMatchedRecoMuon, HI::HLT_HIL2Mu3_NHitQ10_2HF0_v1) || isTriggerMatch(iMatchedRecoMuon, HI::HLT_HIL2Mu3_NHitQ10_2HF_v1)  || 
-      isTriggerMatch(iMatchedRecoMuon, HI::HLT_HIL3Mu3_NHitQ15_2HF0_v1)  || isTriggerMatch(iMatchedRecoMuon, HI::HLT_HIL3Mu3_NHitQ15_2HF_v1)) { 
-      return true;
-    }
-    return false;
+  return (fabs(Muon->Eta()) < 2.4 &&
+          ((fabs(Muon->Eta()) < 1.2 && Muon->Pt() >= 3.5) ||
+           (1.2 <= fabs(Muon->Eta()) && fabs(Muon->Eta()) < 2.1 && Muon->Pt() >= 5.77-1.89*fabs(Muon->Eta())) ||
+           (2.1 <= fabs(Muon->Eta()) && Muon->Pt() >= 1.8)));
   };
 
-  Int_t findGenProbeMuon(Int_t iGenMuon1, Int_t iGenMuon2, Double_t maxDeltaR = 0.5, Double_t maxDPtRel = 0.5, Bool_t checkCharge = true) {
-    Int_t iMatchedRecoMuon1 = getMatchedRecoMuon(iGenMuon1, maxDeltaR, maxDPtRel, checkCharge);
-    Bool_t isGenMuon1TAG = isTagMuon(iMatchedRecoMuon1);
-    Int_t iMatchedRecoMuon2 = getMatchedRecoMuon(iGenMuon2, maxDeltaR, maxDPtRel, checkCharge);
-    Bool_t isGenMuon2TAG = isTagMuon(iMatchedRecoMuon2);
-    if (isGenMuon1TAG==true  && isGenMuon2TAG==false)   { return iGenMuon2; }
-    if (isGenMuon1TAG==false && isGenMuon2TAG==true )   { return iGenMuon1; }
-    if (isGenMuon1TAG==true  && isGenMuon2TAG==true )   { return ( (((double) rand() / (RAND_MAX))>0.5) ? iGenMuon1 : iGenMuon2 ); }
-   
-    return -99;
-  };
+  Bool_t areMuonsInAcceptance2015 (Int_t iRecoQQ)
+  {
+    TLorentzVector *RecoQQmupl = (TLorentzVector*) Reco_QQ_mupl_4mom->At(iRecoQQ);
+    TLorentzVector *RecoQQmumi = (TLorentzVector*) Reco_QQ_mumi_4mom->At(iRecoQQ);
+    return ( isGlobalMuonInAccept2015(RecoQQmupl) && isGlobalMuonInAccept2015(RecoQQmumi) );
+  };  
 
-};
+  Bool_t passQualityCuts (Int_t iRecoQQ) 
+  {
+    Bool_t cond = true;
+    
+    // cond = cond && (Reco_QQ_mumi_highPurity[iRecoQQ]);
+    cond = cond && (Reco_QQ_mumi_isGoodMuon[iRecoQQ]==1);
+    cond = cond && (Reco_QQ_mumi_nTrkWMea[iRecoQQ] > 5);
+    cond = cond && (Reco_QQ_mumi_nPixWMea[iRecoQQ] > 0);
+    cond = cond && (fabs(Reco_QQ_mumi_dxy[iRecoQQ]) < 0.3);
+    cond = cond && (fabs(Reco_QQ_mumi_dz[iRecoQQ]) < 20.);
+    
+    // cond = cond && (Reco_QQ_mupl_highPurity[iRecoQQ]);
+    cond = cond && (Reco_QQ_mupl_isGoodMuon[iRecoQQ]==1);
+    cond = cond && (Reco_QQ_mupl_nTrkWMea[iRecoQQ] > 5);
+    cond = cond && (Reco_QQ_mupl_nPixWMea[iRecoQQ] > 0);
+    cond = cond && (fabs(Reco_QQ_mupl_dxy[iRecoQQ]) < 0.3);
+    cond = cond && (fabs(Reco_QQ_mupl_dz[iRecoQQ]) < 20.);
+    
+    cond = cond && (Reco_QQ_VtxProb[iRecoQQ] > 0.01);
+    
+    return cond;
+  }; 
+
+}
 
 #endif /* EVENTUTILS_H_ */
